@@ -13,14 +13,16 @@ def reset_style(): #터미널 스타일 리셋
 #코드들
 print("================== < Hamming Code Simulation > ==================")
 data = input("Input Binary Data >>> ") #데이터 입력
+
 p_num = find_minimum_k(len(data)) #패리티 수
 
 print(f"패리티 비트 수 : {p_num}\n")
 
-
+#-------------------------------------------- 1번
 print(Style.BRIGHT + "1. 비트배치")
 reset_style()
 
+bits = list() #전송할 비트 배열
 print(Fore.GREEN + "",end='') #터미널 색상
 for i in range(1,len(data)+p_num+1):
     if(i&(i-1) == 0):
@@ -31,39 +33,27 @@ print("")
 for i in range(1,len(data)+p_num+1):
     if(i&(i-1) == 0):
         print("?",end='  ')
+        bits.append("?")
     else:
         print(data[i-p_num-1],end='  ')
+        bits.append(data[i-p_num-1])
         
 reset_style()
 
-#------------------------------------------------------------------------
-hamming = int(input(), 2) #전송 하려는 이진수 값 입력 받음
-hamming = list(str(format(hamming, 'b'))) #입력받은 이진수 값 리스트로 전환
-i = 0
-while(1):
-    if 2**i >= len(hamming) + i + 1:
-        parity = i #parity는 페리티 비트의 개수
-        break
-    i += 1
-bit_leng = len(hamming) + parity #총 비트 길이
+#-------------------------------------------- 2번
+print(Style.BRIGHT + "\n\n2. 패리티비트 계산")
 
-for k in range(bit_leng): #리스트에 페리티 비트가 들어갈 공간 만들기
-    if k <= parity:
-            hamming.insert(2**k-1, '0')
-    else:
-        continue
+bit_leng = len(bits)
 
-bit_leng = len(hamming)
-
-for k in range(parity):
+for k in range(p_num):
     index = 2**k
     xor = 0
 
     for m in range(1, bit_leng + 1):
         if m & index and m != index:
-             xor = xor ^ int(hamming[m-1])
+             xor = xor ^ int(bits[m-1])
 
-    hamming[index - 1] = str(xor)
+    bits[index - 1] = str(xor)
 
 for k in range(bit_leng-1):
-    print(int(hamming[k]), end = '')
+    print(int(bits[k]), end = '')
