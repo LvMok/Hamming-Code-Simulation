@@ -1,7 +1,7 @@
 from colorama import init, Style, Fore
 
 # 초기화
-init(autoreset=True)
+#init(autoreset=True)
 
 # 함수: 최소 패리티 비트 수 구하기
 def find_minimum_k(data_len):
@@ -63,7 +63,9 @@ for k in range(p_num):
     index = 2**k
     xor = 0
 
-    print(f"p{index} 값")
+    print(Fore.CYAN + f"p{index} 값")
+    reset_style()
+
     for m in range(1, total_len + 1):
         if m & index and m != index:
             print(f"{int(bits[m-1])} ⊕", end=' ')
