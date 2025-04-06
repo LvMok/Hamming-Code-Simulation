@@ -48,12 +48,18 @@ bit_leng = len(bits)
 for k in range(p_num):
     index = 2**k
     xor = 0 #XOR 합 초기화
-
+    
+    print(f"p{index} 값")
     for m in range(1, bit_leng + 1):
         if m & index and m != index:
-             xor = xor ^ int(bits[m-1])
+            print(f"{int(bits[m-1])} ⊕",end=' ')
+            xor = xor ^ int(bits[m-1])
+    print(f"\b\b\b = {xor}")      
 
     bits[index - 1] = str(xor)
 
+print(Style.BRIGHT + "\n최종 송신비트")
 for k in range(bit_leng-1):
-    print(int(bits[k]), end = '')
+    print(Fore.BLUE + bits[k], end = ' ')
+
+reset_style()
