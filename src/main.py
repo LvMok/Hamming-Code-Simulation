@@ -1,98 +1,111 @@
 from colorama import init, Style, Fore
 
-# 함수들
-def find_minimum_k(data_len): #최소 패리티 비트 수 구하는 함수
+# 초기화
+init(autoreset=True)
+
+# 함수: 최소 패리티 비트 수 구하기
+def find_minimum_k(data_len):
     k = 1
     while True:
-        if(2**k-1 >= 4+k) : return k
-        k+=1
+        if (2**k - 1) >= data_len + k:
+            return k
+        k += 1
 
-def reset_style(): #터미널 스타일 리셋
-    print(Style.RESET_ALL + "",end='')
+# 함수: 터미널 스타일 리셋
+def reset_style():
+    print(Style.RESET_ALL + "", end='')
 
-#코드들
+# 시작
 print("================== < Hamming Code Simulation > ==================")
-data = input("Input Binary Data >>> ") #데이터 입력
+data = input("Input Binary Data >>> ")  # 데이터 입력
 
-p_num = find_minimum_k(len(data)) #패리티 수
-
+p_num = find_minimum_k(len(data))  # 패리티 수 계산
 print(f"패리티 비트 수 : {p_num}\n")
 
-#-------------------------------------------- 1번 <- 비트 적용
+# 1. 비트 배치
 print(Style.BRIGHT + "1. 비트배치")
 reset_style()
 
-bits = list() #전송할 비트 배열
-print(Fore.GREEN + "",end='') #터미널 색상
-for i in range(1,len(data)+p_num+1):
-    if(i&(i-1) == 0):
-        print(f"p{i}",end=' ')
+bits = []
+data_index = 0
+total_len = len(data) + p_num
+
+# 비트 라벨 출력
+print(Fore.GREEN + "", end='')
+for i in range(1, total_len + 1):
+    if i & (i - 1) == 0:
+        print(f"p{i}", end=' ')
     else:
-        print(f"d{i-p_num+1}",end=' ')
+        print(f"d{data_index + 1}", end=' ')
+        data_index += 1
+
 print("")
-for i in range(1,len(data)+p_num+1):
-    if(i&(i-1) == 0):
-        print("?",end='  ')
+
+# 실제 비트 배치 출력
+bits = []
+data_index = 0
+for i in range(1, total_len + 1):
+    if i & (i - 1) == 0:
+        print("?", end='  ')
         bits.append("?")
     else:
-        print(data[i-p_num-1],end='  ')
-        bits.append(data[i-p_num-1])
-        
+        print(data[data_index], end='  ')
+        bits.append(data[data_index])
+        data_index += 1
+
 reset_style()
 
-#-------------------------------------------- 2번 <- 패리티 비트 계산
+# 2. 패리티 비트 계산
 print(Style.BRIGHT + "\n\n2. 패리티비트 계산")
-
-bit_leng = len(bits)
-
 reset_style()
+
 for k in range(p_num):
     index = 2**k
-    xor = 0 #XOR 합 초기화
-    
+    xor = 0
+
     print(f"p{index} 값")
-    for m in range(1, bit_leng + 1):
+    for m in range(1, total_len + 1):
         if m & index and m != index:
-            print(f"{int(bits[m-1])} ⊕",end=' ')
-            xor = xor ^ int(bits[m-1])
-    print(f"\b\b= {xor}")      
+            print(f"{int(bits[m-1])} ⊕", end=' ')
+            xor ^= int(bits[m-1])
+    print(f"\b\b= {xor}")
 
     bits[index - 1] = str(xor)
 
+# 최종 송신 비트 출력
 print(Style.BRIGHT + "\n최종 송신비트")
-for k in range(bit_leng):
-    print(Fore.BLUE + bits[k], end = ' ')
-
+for b in bits:
+    print(Fore.BLUE + b, end=' ')
 reset_style()
 
-#-------------------------------------------- 3번 <- 오류비트 적용
+# 3. 오류 비트 적용
 print("\n")
-error_bits = input("Input Error Sector(split with ,) >>> ") #오류 발생 부분 입력
-error_bits = error_bits.split(',')
-error = list(bits) #에러비트
+error_bits = input("Input Error Sector(split with ,) >>> ")
+error_bits = [e.strip() for e in error_bits.split(',') if e.strip().isdigit()]
+error = list(bits)
 
 for index in error_bits:
-    error[int(index)-1] = str(int(not int(bits[int(index)-1]))) #비트 배열에 적용
+    idx = int(index) - 1
+    error[idx] = str(int(not int(error[idx])))
 
-#-------------------------------------------- 4번 <- 수신
+# 4. 수신 & 오류 검출
 print(Style.BRIGHT + "\n3. 수신")
 reset_style()
 
-error_p = list() #오류 패리티
+error_p = []
 for k in range(p_num):
     index = 2**k
-    xor = int(error[index-1])
-    
+    xor = int(error[index - 1])
+
     print(Fore.CYAN + f"p{index} 체크")
     reset_style()
-    
-    for i in range(1,len(error)+1):
-        if i&index and i != index:
-            print(f"{int(error[i-1])} ⊕",end=' ')
-            xor = xor ^ int(error[i-1])
-    
-    print(f"\b\b= {xor}",end=' ')
-    
+
+    for i in range(1, total_len + 1):
+        if i & index and i != index:
+            print(f"{int(error[i - 1])} ⊕", end=' ')
+            xor ^= int(error[i - 1])
+
+    print(f"\b\b= {xor}", end=' ')
     if xor:
         print(Fore.RED + f"p{index} 오류발생")
         reset_style()
@@ -100,32 +113,33 @@ for k in range(p_num):
     else:
         print("")
 
+# 오류 위치 판별
 print("")
-sum = 0 #오류 패리티 합
+error_pos = sum(error_p)
 for index in error_p:
-    print(f"{index} +",end=' ')
-    sum += index
-
-print(Fore.RED + f"\b\b= {sum}, {sum}번째 비트 오류확인")
+    print(f"{index} +", end=' ')
+print(Fore.RED + f"\b\b= {error_pos}, {error_pos}번째 비트 오류확인")
 reset_style()
 
-#-------------------------------------------- 5번 <- 오류 수정
+# 5. 오류 수정
 print(Style.BRIGHT + "\n4. 수신 측 오류수정")
 reset_style()
 
-print(f"{sum}번째 비트를 반전 {error[sum-1]} -> {int(not (int(error[sum-1])))}")
-error[sum-1] = str(int(not (int(error[sum-1]))))
+if error_pos == 0:
+    print("오류 없음, 수정 불필요")
+else:
+    print(f"{error_pos}번째 비트를 반전 {error[error_pos - 1]} -> {int(not int(error[error_pos - 1]))}")
+    error[error_pos - 1] = str(int(not int(error[error_pos - 1])))
 
-#-------------------------------------------- 6번 <- 최종
+# 6. 최종 수신 측 비트 출력 (패리티 제거)
 print(Style.BRIGHT + "\n5. 최종 수신 측 비트")
 reset_style()
 
 for index in sorted([2**k for k in range(p_num)], reverse=True):
-    error.pop(index-1)
+    error.pop(index - 1)
 
 for bit in error:
-    print(Fore.GREEN + f"{bit}",end=' ')
-    
+    print(Fore.GREEN + bit, end=' ')
 reset_style()
 
 print("\n================== < Hamming Code Simulation END > ==================")
