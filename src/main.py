@@ -18,7 +18,7 @@ p_num = find_minimum_k(len(data)) #패리티 수
 
 print(f"패리티 비트 수 : {p_num}\n")
 
-#-------------------------------------------- 1번
+#-------------------------------------------- 1번 <- 비트 적용
 print(Style.BRIGHT + "1. 비트배치")
 reset_style()
 
@@ -40,11 +40,12 @@ for i in range(1,len(data)+p_num+1):
         
 reset_style()
 
-#-------------------------------------------- 2번
+#-------------------------------------------- 2번 <- 패리티 비트 계산
 print(Style.BRIGHT + "\n\n2. 패리티비트 계산")
 
 bit_leng = len(bits)
 
+reset_style()
 for k in range(p_num):
     index = 2**k
     xor = 0 #XOR 합 초기화
@@ -54,12 +55,75 @@ for k in range(p_num):
         if m & index and m != index:
             print(f"{int(bits[m-1])} ⊕",end=' ')
             xor = xor ^ int(bits[m-1])
-    print(f"\b\b\b = {xor}")      
+    print(f"\b\b= {xor}")      
 
     bits[index - 1] = str(xor)
 
 print(Style.BRIGHT + "\n최종 송신비트")
-for k in range(bit_leng-1):
+for k in range(bit_leng):
     print(Fore.BLUE + bits[k], end = ' ')
 
+reset_style()
+
+#-------------------------------------------- 3번 <- 오류비트 적용
+print("\n")
+error_bits = input("Input Error Sector(split with ,) >>> ") #오류 발생 부분 입력
+error_bits = error_bits.split(',')
+error = list(bits) #에러비트
+
+for index in error_bits:
+    error[int(index)-1] = str(int(not int(bits[int(index)-1]))) #비트 배열에 적용
+
+#-------------------------------------------- 4번 <- 수신
+print(Style.BRIGHT + "\n3. 수신")
+reset_style()
+
+error_p = list() #오류 패리티
+for k in range(p_num):
+    index = 2**k
+    xor = int(error[index-1])
+    
+    print(Fore.CYAN + f"p{index} 체크")
+    reset_style()
+    
+    for i in range(1,len(error)+1):
+        if i&index and i != index:
+            print(f"{int(error[i-1])} ⊕",end=' ')
+            xor = xor ^ int(error[i-1])
+    
+    print(f"\b\b= {xor}",end=' ')
+    
+    if xor:
+        print(Fore.RED + f"p{index} 오류발생")
+        reset_style()
+        error_p.append(index)
+    else:
+        print("")
+
+print("")
+sum = 0 #오류 패리티 합
+for index in error_p:
+    print(f"{index} +",end=' ')
+    sum += index
+
+print(Fore.RED + f"\b\b= {sum}, {sum}번째 비트 오류확인")
+reset_style()
+
+#-------------------------------------------- 5번 <- 오류 수정
+print(Style.BRIGHT + "\n4. 수신 측 오류수정")
+reset_style()
+
+print(f"{sum}번째 비트를 반전 {error[sum-1]} -> {int(not (int(error[sum-1])))}")
+error[sum-1] = str(int(not (int(error[sum-1]))))
+
+#-------------------------------------------- 6번 <- 최종
+print(Style.BRIGHT + "\n5. 최종 수신 측 비트")
+reset_style()
+
+for index in sorted([2**k for k in range(p_num)], reverse=True):
+    error.pop(index-1)
+
+for bit in error:
+    print(Fore.GREEN + f"{bit}",end=' ')
+    
 reset_style()
