@@ -127,3 +127,5 @@ for bit in error:
     print(Fore.GREEN + f"{bit}",end=' ')
     
 reset_style()
+
+print("\n================== < Hamming Code Simulation END > ==================")
