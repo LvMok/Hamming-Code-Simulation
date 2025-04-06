@@ -47,7 +47,7 @@ bit_leng = len(bits)
 
 for k in range(p_num):
     index = 2**k
-    xor = 0
+    xor = 0 #XOR 합 초기화
 
     for m in range(1, bit_leng + 1):
         if m & index and m != index:
