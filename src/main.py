@@ -53,17 +53,17 @@ for k in range(bit_leng): #리스트에 페리티 비트가 들어갈 공간 만
     else:
         continue
 
-bit_leng = len(hamming)
+bit_leng = len(hamming) #총 비트의 길이에 리스트의 길이 대입입
 
 for k in range(parity):
     index = 2**k
-    xor = 0
+    xor = 0 #XOR 합 초기화
 
     for m in range(1, bit_leng + 1):
         if m & index and m != index:
-             xor = xor ^ int(hamming[m-1])
+             xor = xor ^ int(hamming[m-1]) #비트연산을 이용해 패리티 비트의 값 계산
 
-    hamming[index - 1] = str(xor)
+    hamming[index - 1] = str(xor) #계산된 패리티 비트 값을 각 페리티 비트에 대입
 
 for k in range(bit_leng-1):
-    print(int(hamming[k]), end = '')
+    print(int(hamming[k]), end = '') #최종 해밍 코드 출력
