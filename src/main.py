@@ -55,6 +55,8 @@ for i in range(1, total_len + 1):
 
 reset_style()
 
+input()
+
 # 2. 패리티 비트 계산
 print(Style.BRIGHT + "\n\n2. 패리티비트 계산")
 reset_style()
@@ -123,6 +125,8 @@ for index in error_p:
 print(Fore.RED + f"\b\b= {error_pos}, {error_pos}번째 비트 오류확인")
 reset_style()
 
+input()
+
 # 5. 오류 수정
 print(Style.BRIGHT + "\n4. 수신 측 오류수정")
 reset_style()
@@ -132,6 +136,8 @@ if error_pos == 0:
 else:
     print(f"{error_pos}번째 비트를 반전 {error[error_pos - 1]} -> {int(not int(error[error_pos - 1]))}")
     error[error_pos - 1] = str(int(not int(error[error_pos - 1])))
+
+input()
 
 # 6. 최종 수신 측 비트 출력 (패리티 제거)
 print(Style.BRIGHT + "\n5. 최종 수신 측 비트")
